@@ -7,6 +7,7 @@
 // Since three is external, esbuild leaves 'import' statements; we polyfill here.
 const __threeModule = { ...window.THREE };
 
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
