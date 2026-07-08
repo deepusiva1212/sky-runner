@@ -1,0 +1,31 @@
+{
+  "appId": "com.deepusiva.skyrunner",
+  "appName": "Sky Runner",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "android": {
+    "buildOptions": {
+      "keystorePath": "android/skyrunner.keystore",
+      "keystoreAlias": "skyrunner",
+      "releaseType": "AAB"
+    },
+    "minWebViewVersion": 60
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1800,
+      "backgroundColor": "#0a0014",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false,
+      "spinnerColor": "#FF6FA5"
+    },
+    "StatusBar": {
+      "style": "Dark",
+      "backgroundColor": "#0a0014",
+      "overlaysWebView": true
+    },
+    "Haptics": {
+      "enabled": true
+    }
+  }
+}
