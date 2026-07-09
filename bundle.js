@@ -1,12 +1,11 @@
 
 // Sky Runner — Deepu Siva Private Limited
-// Built: 2026-07-08T04:54:01.472Z
+// Built: 2026-07-09T10:45:02.290Z
 // Three.js is loaded externally via CDN
 
 // Shim: make 'import * as THREE from "three"' work with the global THREE
 // Since three is external, esbuild leaves 'import' statements; we polyfill here.
 const __threeModule = { ...window.THREE };
-
 
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -148,10 +147,12 @@ var TextureGenerator = class {
   static track() {
     return this._getOrCreate("track", () => {
       const { canvas, ctx } = this._canvas(256, 256);
-      const g = ctx.createLinearGradient(0, 0, 256, 0);
-      g.addColorStop(0, "#3A1C6E");
-      g.addColorStop(0.5, "#4A2580");
-      g.addColorStop(1, "#3A1C6E");
+      const g = ctx.createLinearGradient(0, 0, 256, 256);
+      g.addColorStop(0, "#5a2aaa");
+      g.addColorStop(0.3, "#7a3acc");
+      g.addColorStop(0.5, "#8a4adc");
+      g.addColorStop(0.7, "#7a3acc");
+      g.addColorStop(1, "#5a2aaa");
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, 256, 256);
       for (let i = 0; i < 1200; i++) {
@@ -159,8 +160,8 @@ var TextureGenerator = class {
         ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.04})`;
         ctx.fillRect(x, y, 1, 1);
       }
-      ctx.strokeStyle = "rgba(255,255,255,0.3)";
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(255,255,255,0.7)";
+      ctx.lineWidth = 4;
       for (let y = 0; y < 256; y += 40) {
         ctx.beginPath();
         ctx.moveTo(128, y);
@@ -180,7 +181,13 @@ var TextureGenerator = class {
       const { canvas, ctx } = this._canvas(128, 256);
       ctx.fillStyle = colorHex;
       ctx.fillRect(0, 0, 128, 256);
-      const winColors = ["rgba(255,230,130,0.9)", "rgba(100,180,255,0.7)", "rgba(255,255,255,0.1)"];
+      const grad = ctx.createLinearGradient(0, 0, 128, 0);
+      grad.addColorStop(0, "rgba(255,255,255,0.08)");
+      grad.addColorStop(0.5, "rgba(255,255,255,0.18)");
+      grad.addColorStop(1, "rgba(255,255,255,0.05)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 128, 256);
+      const winColors = ["rgba(255,240,160,1.0)", "rgba(160,220,255,0.95)", "rgba(255,180,255,0.85)"];
       for (let row = 10; row < 256; row += 22) {
         for (let col = 8; col < 128; col += 18) {
           const lit = Math.random() > 0.35;
@@ -391,9 +398,12 @@ var TextureGenerator = class {
     return this._getOrCreate(key, () => {
       const { canvas, ctx } = this._canvas(2, 512);
       const themes = {
-        city: ["#0D001A", "#1a0533", "#2D1B5E"],
-        jungle: ["#0A2E0A", "#145214", "#1E7A1E"],
-        space: ["#000510", "#050A2E", "#0A1060"]
+        city: ["#1a0a3e", "#3a1a7e", "#6a2faf"],
+        // rich purple-violet, much brighter
+        jungle: ["#0a3a1a", "#1a6a2a", "#2aaa4a"],
+        // vivid jungle green
+        space: ["#00082a", "#0a1060", "#1a2aaa"]
+        // deep space blue
       };
       const cols = themes[theme] || themes.city;
       const g = ctx.createLinearGradient(0, 0, 0, 512);
@@ -427,49 +437,43 @@ var TRACK = {
 };
 var PLAYER = {
   START_LANE: 1,
-  // Center lane
   START_Z: 7,
-  // Z position (fixed, world moves toward player)
   HEIGHT: 2,
-  // Standing height
   ROLL_HEIGHT: 0.8,
-  // Crouched height
-  JUMP_VELOCITY: 0.19,
-  // Initial jump Y velocity
-  JUMP_DOUBLE_VELOCITY: 0.15,
-  // Double jump Y velocity
-  GRAVITY: -0.012,
-  // Gravity applied per frame
-  LANE_SWITCH_SPEED: 0.18,
-  // Lerp factor for lane switching
-  INVINCIBLE_DURATION: 90,
-  // Frames of invincibility after hit
-  COLLISION_RADIUS_X: 0.45,
-  COLLISION_RADIUS_Y: 1,
-  COLLISION_RADIUS_Z: 0.6
+  JUMP_VELOCITY: 0.22,
+  // Higher jump = clears obstacles easier
+  JUMP_DOUBLE_VELOCITY: 0.17,
+  GRAVITY: -0.01,
+  // Gentler gravity = more air time
+  LANE_SWITCH_SPEED: 0.2,
+  INVINCIBLE_DURATION: 110,
+  // Longer invincibility after hit
+  COLLISION_RADIUS_X: 0.26,
+  // Much narrower — forgiving side collision
+  COLLISION_RADIUS_Y: 0.7,
+  // Shorter — jumping clears boxes easily
+  COLLISION_RADIUS_Z: 0.32
+  // Shallower depth window
 };
 var SPEED = {
-  INITIAL: 0.28,
-  // Starting world scroll speed
-  MAX: 0.65,
-  // Maximum speed
-  INCREMENT: 85e-6,
-  // Speed increase per frame
-  BOOST_MULTIPLIER: 1.8
-  // Speed multiplier during Boost powerup
+  INITIAL: 0.09,
+  // Very slow start like Subway Surfers
+  MAX: 0.52,
+  // Max speed (reached after ~4 min)
+  INCREMENT: 22e-6,
+  // Very gradual — slow ramp up
+  BOOST_MULTIPLIER: 1.6
 };
 var OBSTACLES = {
   POOL_SIZE: 20,
-  SPAWN_Z: -65,
-  // Spawn far in front
-  DESPAWN_Z: 14,
-  // Remove when behind camera
-  INITIAL_INTERVAL: 3.5,
-  // Seconds between spawns at start
+  SPAWN_Z: -85,
+  // Spawn further = more reaction time
+  DESPAWN_Z: 16,
+  INITIAL_INTERVAL: 5.5,
+  // Much larger gap at start (was 3.5)
   MIN_INTERVAL: 1.8,
-  // Minimum spawn interval (hardest)
-  DIFFICULTY_SCALE: 25e-5
-  // How fast interval shrinks
+  DIFFICULTY_SCALE: 1e-4
+  // Slower ramp up (was 0.00025)
 };
 var COINS = {
   POOL_SIZE: 40,
@@ -503,14 +507,17 @@ var SCORING = {
   // Coins to increase multiplier
 };
 var CAMERA = {
-  POSITION: { x: 0, y: 4.5, z: 10 },
-  LOOK_AT: { x: 0, y: 1.5, z: -5 },
-  FOV: 65,
+  POSITION: { x: 0, y: 5.5, z: 12 },
+  // Higher and further back = more view
+  LOOK_AT: { x: 0, y: 0.5, z: -18 },
+  // Look much further ahead (was -5)
+  FOV: 72,
+  // Wider FOV = more visible (was 65)
   NEAR: 0.1,
-  FAR: 200,
-  LEAN_AMOUNT: 0.18,
-  // How much camera pans on lane switch
-  LEAN_SPEED: 0.06
+  FAR: 400,
+  // Much further draw distance (was 200)
+  LEAN_AMOUNT: 0.14,
+  LEAN_SPEED: 0.05
 };
 var PARTICLES = {
   MAX_PARTICLES: 500,
@@ -570,7 +577,7 @@ var MenuScene = class {
     this._onPlay = onPlay;
     this._frame = 0;
     this._scene = new THREE2.Scene();
-    this._scene.fog = new THREE2.FogExp2(1705267, 0.04);
+    this._scene.fog = new THREE2.FogExp2(2756704, 0.01);
     this._camera = new THREE2.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
     this._camera.position.set(0, 2.5, 6);
     this._camera.lookAt(0, 1.2, 0);
@@ -584,11 +591,11 @@ var MenuScene = class {
   }
   /* ─── 3D PREVIEW ─── */
   _buildLights() {
-    this._scene.add(new THREE2.AmbientLight(16777215, 0.5));
-    const sun = new THREE2.DirectionalLight(16773344, 1);
+    this._scene.add(new THREE2.AmbientLight(15654399, 1.4));
+    const sun = new THREE2.DirectionalLight(16774604, 2.2);
     sun.position.set(4, 10, 6);
     this._scene.add(sun);
-    const fill = new THREE2.PointLight(16740261, 0.8, 16);
+    const fill = new THREE2.PointLight(16724889, 2, 28);
     fill.position.set(-3, 4, 5);
     this._scene.add(fill);
     this._fillLight = fill;
@@ -1042,7 +1049,7 @@ var Player = class {
     this._shadow.position.y = 0.01;
     this._group.add(this._shadow);
     const bodyGeo = new THREE3.CylinderGeometry(0.38, 0.42, 0.85, 12);
-    this._bodyMat = new THREE3.MeshLambertMaterial({ map: TextureGenerator.skinRosa() });
+    this._bodyMat = new THREE3.MeshLambertMaterial({ map: TextureGenerator.skinRosa(), emissive: 2228241, emissiveIntensity: 0.3 });
     this._body = new THREE3.Mesh(bodyGeo, this._bodyMat);
     this._body.position.y = 1.1;
     this._body.castShadow = true;
@@ -1264,8 +1271,14 @@ var Player = class {
     const px = this._group.position.x;
     const py = this._group.position.y;
     const pz = PLAYER.START_Z;
-    const collisionHeight = this._isRolling ? PLAYER.ROLL_HEIGHT : PLAYER.HEIGHT;
-    return Math.abs(px - obstacleBox.x) < PLAYER.COLLISION_RADIUS_X + obstacleBox.rx && Math.abs(pz - obstacleBox.z) < PLAYER.COLLISION_RADIUS_Z + obstacleBox.rz && py < collisionHeight && py + collisionHeight > obstacleBox.y;
+    const playerYBottom = py + 0.15;
+    const playerYTop = py + (this._isRolling ? 0.85 : 1.65);
+    const obsYBottom = 0;
+    const obsYTop = obstacleBox.y + (obstacleBox.height || 0.9);
+    const xOverlap = Math.abs(px - obstacleBox.x) < PLAYER.COLLISION_RADIUS_X + obstacleBox.rx;
+    const zOverlap = Math.abs(pz - obstacleBox.z) < PLAYER.COLLISION_RADIUS_Z + obstacleBox.rz;
+    const yOverlap = playerYBottom < obsYTop && playerYTop > obsYBottom + 0.15;
+    return xOverlap && zOverlap && yOverlap;
   }
   hit() {
     this._invincible = PLAYER.INVINCIBLE_DURATION;
@@ -1336,7 +1349,7 @@ var Track = class {
     const trackTex = TextureGenerator.track();
     for (let i = 0; i < TRACK.NUM_SEGMENTS; i++) {
       const geo = new THREE4.BoxGeometry(segW, 0.18, segLen);
-      const mat = new THREE4.MeshLambertMaterial({ map: trackTex });
+      const mat = new THREE4.MeshLambertMaterial({ map: trackTex, color: 14531583 });
       const mesh = new THREE4.Mesh(geo, mat);
       mesh.receiveShadow = true;
       mesh.position.set(0, -0.09, TRACK.SCROLL_START_Z - i * segLen);
@@ -1345,7 +1358,7 @@ var Track = class {
     }
   }
   _buildWalls() {
-    const colors = [16740261, 12602623];
+    const colors = [16724872, 12255487];
     const totalLen = TRACK.NUM_SEGMENTS * TRACK.SEGMENT_LENGTH;
     [-TRACK.SIDE_WALL_X, TRACK.SIDE_WALL_X].forEach((x, i) => {
       const wallGeo = new THREE4.BoxGeometry(0.22, 1.4, totalLen);
@@ -1376,7 +1389,7 @@ var Track = class {
     const dashGap = 1.2;
     const dashH = 0.01;
     const totalLen = TRACK.NUM_SEGMENTS * TRACK.SEGMENT_LENGTH;
-    const dashMat = new THREE4.MeshBasicMaterial({ color: 16777215, transparent: true, opacity: 0.28 });
+    const dashMat = new THREE4.MeshBasicMaterial({ color: 16777215, transparent: true, opacity: 0.75 });
     [-1.1, 1.1].forEach((x) => {
       for (let z = 0; z > -totalLen; z -= dashLen + dashGap) {
         const geo = new THREE4.BoxGeometry(0.06, dashH, dashLen);
@@ -1387,12 +1400,12 @@ var Track = class {
     });
   }
   _buildEdgeDecorations() {
-    const lightColors = [16740261, 12602623, 2282478, 16765503];
+    const lightColors = [16724872, 14483711, 61183, 16772608, 65416, 16737792];
     const totalLen = TRACK.NUM_SEGMENTS * TRACK.SEGMENT_LENGTH;
     for (let z = 0; z > -totalLen; z -= 5) {
       [-TRACK.SIDE_WALL_X + 0.2, TRACK.SIDE_WALL_X - 0.2].forEach((x, si) => {
         const col = lightColors[Math.floor(Math.abs(z) / 5 + si) % lightColors.length];
-        const geo = new THREE4.SphereGeometry(0.09, 5, 4);
+        const geo = new THREE4.SphereGeometry(0.14, 6, 5);
         const mat = new THREE4.MeshBasicMaterial({ color: col });
         const orb = new THREE4.Mesh(geo, mat);
         orb.position.set(x, 0.1, TRACK.SCROLL_START_Z + z);
@@ -1482,7 +1495,7 @@ var ObjectPool = class {
 var BoxCrate = class {
   constructor(scene) {
     const geo = new THREE5.BoxGeometry(0.9, 0.9, 0.9);
-    const mat = new THREE5.MeshLambertMaterial({ map: TextureGenerator.crateBox() });
+    const mat = new THREE5.MeshLambertMaterial({ map: TextureGenerator.crateBox(), emissive: 4456448, emissiveIntensity: 0.4 });
     this.mesh = new THREE5.Mesh(geo, mat);
     this.mesh.castShadow = true;
     this.mesh.visible = false;
@@ -1517,14 +1530,14 @@ var BoxCrate = class {
     return this.mesh.position.x;
   }
   get boundingBox() {
-    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz };
+    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz, height: this.height };
   }
 };
 var Barrier = class {
   constructor(scene) {
     this._group = new THREE5.Group();
     const bodyGeo = new THREE5.BoxGeometry(1.8, 1, 0.32);
-    const bodyMat = new THREE5.MeshLambertMaterial({ color: 16748288 });
+    const bodyMat = new THREE5.MeshLambertMaterial({ color: 16750848, emissive: 4465152, emissiveIntensity: 0.5 });
     this._body = new THREE5.Mesh(bodyGeo, bodyMat);
     this._body.position.y = 0.5;
     this._body.castShadow = true;
@@ -1576,14 +1589,14 @@ var Barrier = class {
     return this._group.position.x;
   }
   get boundingBox() {
-    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz };
+    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz, height: this.height };
   }
 };
 var LowBeam = class {
   constructor(scene) {
     this._group = new THREE5.Group();
     const beamGeo = new THREE5.BoxGeometry(1.85, 0.22, 0.4);
-    const beamMat = new THREE5.MeshLambertMaterial({ color: 8069026 });
+    const beamMat = new THREE5.MeshLambertMaterial({ color: 11141375, emissive: 3342421, emissiveIntensity: 0.6 });
     this._beam = new THREE5.Mesh(beamGeo, beamMat);
     this._beam.position.y = 1.02;
     this._beam.castShadow = true;
@@ -1626,7 +1639,7 @@ var LowBeam = class {
     return this._group.position.x;
   }
   get boundingBox() {
-    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz };
+    return { x: this.x, y: this.y, z: this.z, rx: this.rx, rz: this.rz, height: this.height };
   }
 };
 var ObstacleManager = class {
@@ -2012,7 +2025,7 @@ var Environment = class {
     this._buildGroundFog();
   }
   _buildSky() {
-    const skyGeo = new THREE7.SphereGeometry(120, 16, 12);
+    const skyGeo = new THREE7.SphereGeometry(300, 16, 12);
     const skyMat = new THREE7.MeshBasicMaterial({
       map: TextureGenerator.skyGradient(this._theme),
       side: THREE7.BackSide
@@ -2153,7 +2166,7 @@ var Environment = class {
   /** Call every frame from game loop */
   update(speed) {
     this._frame++;
-    const totalLen = 140;
+    const totalLen = 280;
     [...this._groups.far, ...this._groups.mid].forEach((b) => {
       b.mesh.position.z += b.scrollSpeed * speed * 2.2;
       if (b.mesh.position.z > 12) {
@@ -2736,7 +2749,7 @@ var GameScene = class {
     this._audio = audio;
     this._save = save;
     this._scene = new THREE9.Scene();
-    this._scene.fog = new THREE9.FogExp2(1705267, 0.038);
+    this._scene.fog = new THREE9.FogExp2(3807854, 0.012);
     this._camera = new THREE9.PerspectiveCamera(
       CAMERA.FOV,
       canvas.clientWidth / canvas.clientHeight,
@@ -2778,23 +2791,29 @@ var GameScene = class {
     this._audio.init();
   }
   _buildLights() {
-    const ambient = new THREE9.AmbientLight(16777215, 0.45);
+    const ambient = new THREE9.AmbientLight(16772863, 1.1);
     this._scene.add(ambient);
-    const sun = new THREE9.DirectionalLight(16773344, 1.1);
-    sun.position.set(6, 18, 8);
+    const sun = new THREE9.DirectionalLight(16774604, 2.2);
+    sun.position.set(8, 22, 10);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 80;
-    sun.shadow.camera.left = sun.shadow.camera.bottom = -12;
-    sun.shadow.camera.right = sun.shadow.camera.top = 12;
+    sun.shadow.camera.far = 120;
+    sun.shadow.camera.left = sun.shadow.camera.bottom = -20;
+    sun.shadow.camera.right = sun.shadow.camera.top = 20;
     this._scene.add(sun);
-    const fill = new THREE9.PointLight(16740261, 0.7, 22);
-    fill.position.set(-5, 5, 8);
+    const sun2 = new THREE9.DirectionalLight(13426175, 1.2);
+    sun2.position.set(-6, 12, 14);
+    this._scene.add(sun2);
+    const fill = new THREE9.PointLight(16740261, 1.8, 35);
+    fill.position.set(-5, 6, 10);
     this._scene.add(fill);
-    const rim = new THREE9.PointLight(12602623, 0.5, 18);
-    rim.position.set(5, 4, 6);
+    const rim = new THREE9.PointLight(12602623, 1.4, 30);
+    rim.position.set(5, 5, 8);
     this._scene.add(rim);
+    const bounce = new THREE9.PointLight(10053375, 0.8, 20);
+    bounce.position.set(0, 0.5, 7);
+    this._scene.add(bounce);
     this._fillLight = fill;
     this._rimLight = rim;
   }
@@ -3437,7 +3456,7 @@ var Game = class {
     this._renderer.shadowMap.type = THREE10.PCFSoftShadowMap;
     this._renderer.outputColorSpace = THREE10.SRGBColorSpace;
     this._renderer.toneMapping = THREE10.ACESFilmicToneMapping;
-    this._renderer.toneMappingExposure = 1.1;
+    this._renderer.toneMappingExposure = 1.6;
     this._resize();
     window.addEventListener("resize", () => this._resize());
     this._menuScene = null;
